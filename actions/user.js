@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { generateAIInsights } from "./dashboard";
+import { checkUser } from "@/lib/checkUser";
 
 export async function updateUser(data) {
     const { userId } = await auth();
@@ -66,27 +67,25 @@ export async function getUserOnboardingStatus() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
   try {
-    const user = await db.user.findUnique({
-      where: {
-        clerkUserId: userId,
-      },
+    let user = await db.user.findUnique({
+      where: { clerkUserId: userId },
       select: {
         industry: true,
       },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
+
+    if (!user) throw new Error("User not found");
 
     return {
       isOnboarded: !!user?.industry,
     };
   } catch (error) {
     console.error("Error checking onboarding status:", error.message);
-    throw new Error("Failed to check onboarding status");
+    throw new Error("Failed to check onboarding status: " + error.message);
   }
 }
