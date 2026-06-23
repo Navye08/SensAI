@@ -11,7 +11,7 @@ import { Toaster } from "sonner";
 const inter = Inter({subsets: ["latin"] });
 export const metadata = {
   title: "Sensai - AI Career Coach",
-  description: "",
+  description: "Career Coach is an AI-powered web app that offers personalized career guidance, resume tips, skill development plans, and mock interview support to help users navigate their career journey with confidence.",
 };
 
 export default function RootLayout({ children }) {
